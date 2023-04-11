@@ -1,31 +1,25 @@
-from product import Product
-from accounts import UserAccount
-from invoice import Invoice
+from citizen import Citizen
+from terminals import JobTerminal, CafeTerminal, CinemaTerminal, UtilityServiceTerminal
 
 if __name__ == "__main__":
-    john_doe = UserAccount()
-    john_doe.accrue(500, 'Зачисление заработной платы', 'cash')
-    john_doe.pay(70, 'cash') # Комунальные платежи
 
-    Invoice()\
-        .add_product(Product(
-            name='Вареники с вишней',
-            count=1,
-            price=100
-        ))\
-        .add_product(Product(
-            name='Эспрессо',
-            count=2,
-            price=50
-        ))\
-        .add_product(Product(
-            name='Добавка: Молоко',
-            count=1,
-            price=25
-        ))\
-        .pay_invoice(john_doe.cash)
+    # Жил-был Джон
+    john_doe = Citizen()
+
+    # Пришел Джон на работу за зарплатой
+    JobTerminal(0).dispatch_operation(john_doe, 'Jonh Doe')
+
+    # Оплатил комуналку
+    UtilityServiceTerminal(100).dispatch_operation(john_doe)
+
+    # Сходил в кино
+    CinemaTerminal(100).dispatch_operation(john_doe)
+
+    # И поужинал в кафе
+    CafeTerminal(100).dispatch_operation(john_doe)
     
-    print(john_doe.cash.balance)
-    print(john_doe.bonus.balance)
-    print(john_doe.spent.balance)
+    # И осталось у джона столько вот денег
+    print(john_doe.cash_account.balance)
+    print(john_doe.bonus_account.balance)
+    print(john_doe.total_spent_account.balance)
     
