@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from .exceptions import PaymentError, BalanceBelowZeroError, PayError, WriteOffError
+from .exceptions import BalanceBelowZeroError, PayError, WriteOffError
 
 
 class AccountBalance:
@@ -52,14 +52,14 @@ class CashAccount(AccountBalance, IAccruable, IPayable, IWriteOffable):
         try:
             self.balance -= amount
         except BalanceBelowZeroError as e:
-            raise PayError("Недостаточно средств для оплаты") from e
+            raise PayError("Недостаточно наличных для оплаты") from e
 
     def write_off(self, amount: int):
         print(f'Списание с наличного счета на сумму {amount} рублей')
         try:
             self.balance -= amount
         except BalanceBelowZeroError as e:
-            raise WriteOffError("Недостаточно средств для списания") from e
+            raise WriteOffError("Недостаточно наличных для списания") from e
 
     def accrue(self, amount: int):
         print(f'Начисление на наличный счет на сумму {amount} рублей')
@@ -74,7 +74,7 @@ class BonusAccount(AccountBalance, IAccruable, IPayable):
         try:
             self.balance -= amount
         except BalanceBelowZeroError as e:
-            raise PayError("Недостаточно средств для оплаты") from e
+            raise PayError("Недостаточно бонусов для оплаты") from e
 
     def accrue(self, amount: int):
         print(f'Начисление на бонусный счет на сумму {amount} рублей')
