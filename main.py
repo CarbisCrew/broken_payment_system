@@ -1,5 +1,5 @@
-from citizen import Citizen
-from terminals import JobTerminal, CafeTerminal, CinemaTerminal, UtilityServiceTerminal
+from payment_system.citizen import Citizen
+from payment_system.terminals import JobTerminal, CafeTerminal, CinemaTerminal, UtilityServiceTerminal
 
 if __name__ == "__main__":
 

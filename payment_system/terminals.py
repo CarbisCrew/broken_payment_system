@@ -1,22 +1,26 @@
 from abc import ABC, abstractmethod
-from accounts import IAccount
 from typing import Iterable
-from citizen import Citizen
+
+from .accounts import AbstractAccount
+from .citizen import Citizen
+
 
 class PaymentTerminal(ABC):
+    """Абстрактный класс платежного терминала"""
+
     def __init__(self, transaction_sum: int):
         self.__sum__ = transaction_sum
 
     @abstractmethod
-    def process_cash_operation(self, cash_account: IAccount):
+    def process_cash_operation(self, cash_account: AbstractAccount):
         ...
 
     @abstractmethod
-    def process_bonus_operation(self, bonus_account: IAccount):
+    def process_bonus_operation(self, bonus_account: AbstractAccount):
         ...
 
     @abstractmethod
-    def process_total_spent_operation(self, total_spent_account: IAccount):
+    def process_total_spent_operation(self, total_spent_account: AbstractAccount):
         ...
 
     @abstractmethod
@@ -32,14 +36,14 @@ class PaymentTerminal(ABC):
 
 # Платежный терминал в кафе
 class CafeTerminal(PaymentTerminal):
-    
-    def process_cash_operation(self, cash_account: IAccount):
+
+    def process_cash_operation(self, cash_account: AbstractAccount):
         cash_account.pay(self.__sum__)
 
-    def process_bonus_operation(self, bonus_account: IAccount):
+    def process_bonus_operation(self, bonus_account: AbstractAccount):
         bonus_account.accrue(self.__sum__ * .1)
 
-    def process_total_spent_operation(self, total_spent_account: IAccount):
+    def process_total_spent_operation(self, total_spent_account: AbstractAccount):
         total_spent_account.accrue(self.__sum__)
 
     def notify(self, citizen: Citizen):
@@ -49,7 +53,7 @@ class CafeTerminal(PaymentTerminal):
 # Платежный терминал в кинотеатре
 class CinemaTerminal(CafeTerminal):
 
-    def process_bonus_operation(self, bonus_account: IAccount):
+    def process_bonus_operation(self, bonus_account: AbstractAccount):
         bonus_account.accrue(self.__sum__ * .15)
 
     def notify(self, citizen: Citizen):
@@ -59,11 +63,11 @@ class CinemaTerminal(CafeTerminal):
 # Платежный терминал в комунальном сервисе
 class UtilityServiceTerminal(CafeTerminal):
 
-    def process_cash_operation(self, cash_account: IAccount):
+    def process_cash_operation(self, cash_account: AbstractAccount):
         super().process_cash_operation(cash_account)
         cash_account.writeoff(self.__sum__ * .1)
 
-    def process_bonus_operation(self, bonus_account: IAccount):
+    def process_bonus_operation(self, bonus_account: AbstractAccount):
         pass
 
     def notify(self, citizen: Citizen):
@@ -72,14 +76,14 @@ class UtilityServiceTerminal(CafeTerminal):
 
 # Палтежный терминал на работе
 class JobTerminal(PaymentTerminal):
-    
-    def process_cash_operation(self, cash_account: IAccount, citizen_name: str):
+
+    def process_cash_operation(self, cash_account: AbstractAccount, citizen_name: str):
         cash_account.accrue(len(citizen_name) * 100)
 
-    def process_bonus_operation(self, bonus_account: IAccount):
+    def process_bonus_operation(self, bonus_account: AbstractAccount):
         pass
 
-    def process_total_spent_operation(self, total_spent_account: IAccount):
+    def process_total_spent_operation(self, total_spent_account: AbstractAccount):
         pass
 
     def notify(self, citizen: Citizen):
@@ -88,4 +92,3 @@ class JobTerminal(PaymentTerminal):
     def dispatch_operation(self, citizen: Citizen, citizen_name: str):
         self.process_cash_operation(citizen.cash_account, citizen_name)
         self.notify(citizen)
-        
