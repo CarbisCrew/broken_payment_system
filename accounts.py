@@ -1,73 +1,64 @@
 from abc import ABC, abstractmethod
+from notify import Notify
 
 class PaymentError(Exception):
     ...
 
-class IAccount(ABC):
-
+class Account(ABC):
     def __init__(self, initial_balance: int = 0) -> None:
         self.__balance__ = initial_balance
 
     @property
     def balance(self) -> int:
         return self.__balance__
-
-    @abstractmethod
-    def pay(self, sum: int):
-        ...
-
-    @abstractmethod
-    def writeoff(self, sum: int):
-        ...
-
-    @abstractmethod
-    def accrue(self, sum: int):
-        ...
-
-# Наличный счет
-class CashAccount(IAccount):
     
+    def _notify(self, message: str):
+        Notify(message).message_send()
+
+class IPayAccount(ABC):
+    @abstractmethod
     def pay(self, sum: int):
-        if self.balance < sum:
+        pass
+
+class IWriteoffAccount(ABC):
+    @abstractmethod
+    def writeoff(self, sum: int):
+        pass
+
+class IAccrueAccount(ABC):
+    @abstractmethod
+    def accrue(self, sun: int):
+        pass
+
+class CashAccount(Account, IPayAccount, IWriteoffAccount, IAccrueAccount):
+    def pay(self, sum: int):
+        self._notify(f'Оплата с наличного счета на сумму {sum} рублей')
+        if self.__balance__ < sum:
             raise PaymentError('Недостаточно средств')
-        print(f'Оплата с наличного счета на сумму {sum} рублей')
-        self.__balance__ -= sum
+        self.__balance__-=sum
 
-    def writeoff(self, sum: int):
-        print(f'Списание с наличного счета на сумму {sum} рублей')
-        self.__balance__ -= sum
+    def writeoff(self, sum:int):
+        self._notify(f'Списание с наличного счета на сумму {sum} рублей')
+        self.__balance__-=sum
 
     def accrue(self, sum: int):
-        print(f'Начисление на наличный счет на сумму {sum} рублей')
-        self.__balance__ += sum
-       
+        self._notify(f'Начисление на наличный счет на сумму {sum} рублей')
+        self.__balance__+=sum
 
-# Бонусный счет
-class BonusAccount(IAccount):
+class BonusAccount(Account, IPayAccount, IAccrueAccount):
 
     def pay(self, sum: int):
-        if self.balance < sum:
+        self._notify(f'Оплата с бонусного счета на сумму {sum} рублей')
+        if self.__balance__ < sum:
             raise PaymentError('Недостаточно средств')
-        print(f'Оплата с бонусного счета на сумму {sum} рублей')
-        self.__balance__ -= sum
-
-    def writeoff(self, sum: int):
-        raise PaymentError(f'Изъятие средств с бонусного счета запрещено')
+        self.__balance__-=sum
 
     def accrue(self, sum: int):
-        print(f'Начисление на бонусный счет на сумму {sum} рублей')
-        self.__balance__ += sum
+        self._notify(f'Начисление на бонусный счет на сумму {sum} рублей')
+        self.__balance__+=sum
 
-
-class TotalSpentAccount(IAccount):
-
-    def pay(self, sum: int):
-        raise PaymentError(f'Запрещено оплачивать покупки со счета потрат')
-
-    def writeoff(self, sum: int):
-        raise PaymentError(f'Запрещено списывать средства со счета потрат')
+class TotalSpentAccount(Account, IAccrueAccount):
 
     def accrue(self, sum: int):
-        print(f'Начисление на счет потрат на сумму {sum} рублей')
-        self.__balance__ += sum
-        
+        self._notify(f'Начисление на счет потрат на сумму {sum} рублей')
+        self.__balance__+=sum
