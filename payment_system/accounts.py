@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from .exceptions import BalanceBelowZeroError, PayError, WriteOffError
 
 
-class AccountBalance:
+class Account:
     """Стандартный счет с балансом"""
 
     def __init__(self, initial_balance: int = 0) -> None:
@@ -44,46 +44,46 @@ class IWriteOffable(ABC):
         ...
 
 
-class CashAccount(AccountBalance, IAccruable, IPayable, IWriteOffable):
+class CashAccount(Account, IAccruable, IPayable, IWriteOffable):
     """Наличный счет"""
 
-    def pay(self, amount: int):
+    def pay(self, amount: int) -> None:
         print(f'Оплата с наличного счета на сумму {amount} рублей')
         try:
             self.balance -= amount
         except BalanceBelowZeroError as e:
             raise PayError("Недостаточно наличных для оплаты") from e
 
-    def write_off(self, amount: int):
+    def write_off(self, amount: int) -> None:
         print(f'Списание с наличного счета на сумму {amount} рублей')
         try:
             self.balance -= amount
         except BalanceBelowZeroError as e:
             raise WriteOffError("Недостаточно наличных для списания") from e
 
-    def accrue(self, amount: int):
+    def accrue(self, amount: int) -> None:
         print(f'Начисление на наличный счет на сумму {amount} рублей')
         self.balance += amount
 
 
-class BonusAccount(AccountBalance, IAccruable, IPayable):
+class BonusAccount(Account, IAccruable, IPayable):
     """Бонусный счет"""
 
-    def pay(self, amount: int):
+    def pay(self, amount: int) -> None:
         print(f"Оплата с бонусного счета на сумму {amount} рублей")
         try:
             self.balance -= amount
         except BalanceBelowZeroError as e:
             raise PayError("Недостаточно бонусов для оплаты") from e
 
-    def accrue(self, amount: int):
+    def accrue(self, amount: int) -> None:
         print(f'Начисление на бонусный счет на сумму {amount} рублей')
         self.balance += amount
 
 
-class TotalSpentAccount(AccountBalance, IAccruable):
+class TotalSpentAccount(Account, IAccruable):
     """Счет потраченных денег"""
 
-    def accrue(self, amount: int):
+    def accrue(self, amount: int) -> None:
         print(f'Начисление на счет потрат на сумму {amount} рублей')
         self.balance += amount
