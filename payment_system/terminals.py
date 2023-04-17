@@ -30,7 +30,15 @@ class PayableWithBonuses(ABC):
         ...
 
 
-class CafeTerminal(PaymentTerminal, PayableWithCash, PayableWithBonuses):
+class PayableWithBonusesTerminal(PaymentTerminal, PayableWithBonuses, ABC):
+    """Абстрактный терминал с возможностью оплаты бонусами"""
+
+    def process_bonus_operation(self, citizen: Citizen) -> None:
+        citizen.bonus_account.pay(self._sum)
+        self._notify()
+
+
+class CafeTerminal(PayableWithBonusesTerminal, PayableWithCash):
     """Платежный терминал в кафе"""
 
     def process_cash_operation(self, citizen: Citizen) -> None:
@@ -39,25 +47,17 @@ class CafeTerminal(PaymentTerminal, PayableWithCash, PayableWithBonuses):
         citizen.total_spent_account.accrue(self._sum)
         self._notify()
 
-    def process_bonus_operation(self, citizen: Citizen) -> None:
-        citizen.bonus_account.pay(self._sum)
-        self._notify()
-
     def _notify(self) -> None:
         print(f'Добро пожаловать в кафе! Спасибо за покупку на {self._sum} рублей! Приятного аппетита!')
 
 
-class CinemaTerminal(PaymentTerminal, PayableWithCash, PayableWithBonuses):
+class CinemaTerminal(PayableWithBonusesTerminal, PayableWithCash):
     """Платежный терминал в кинотеатре"""
 
     def process_cash_operation(self, citizen: Citizen) -> None:
         citizen.cash_account.pay(self._sum)
         citizen.bonus_account.accrue(int(self._sum * .15))
         citizen.total_spent_account.accrue(self._sum)
-        self._notify()
-
-    def process_bonus_operation(self, citizen: Citizen) -> None:
-        citizen.bonus_account.pay(self._sum)
         self._notify()
 
     def _notify(self) -> None:
