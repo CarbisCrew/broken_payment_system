@@ -4,7 +4,7 @@ from notify import Notify
 class PaymentError(Exception):
     ...
 
-class IAccount(ABC):
+class Account(ABC):
     def __init__(self, initial_balance: int = 0) -> None:
         self.__balance__ = initial_balance
 
@@ -13,25 +13,24 @@ class IAccount(ABC):
         return self.__balance__
     
     def _notify(self, message: str):
-        notify = Notify(message)
-        notify.sms_send()
+        Notify(message).message_send()
 
-class PayAccount(IAccount):
+class IPayAccount(ABC):
     @abstractmethod
     def pay(self, sum: int):
         pass
 
-class WriteoffAccount(IAccount):
+class IWriteoffAccount(ABC):
     @abstractmethod
     def writeoff(self, sum: int):
         pass
 
-class AccrueAccount(IAccount):
+class IAccrueAccount(ABC):
     @abstractmethod
     def accrue(self, sun: int):
         pass
 
-class CashAccount(PayAccount, WriteoffAccount, AccrueAccount):
+class CashAccount(Account, IPayAccount, IWriteoffAccount, IAccrueAccount):
     def pay(self, sum: int):
         self._notify(f'Оплата с наличного счета на сумму {sum} рублей')
         if self.__balance__ < sum:
@@ -46,7 +45,7 @@ class CashAccount(PayAccount, WriteoffAccount, AccrueAccount):
         self._notify(f'Начисление на наличный счет на сумму {sum} рублей')
         self.__balance__+=sum
 
-class BonusAccount(PayAccount, AccrueAccount):
+class BonusAccount(Account, IPayAccount, IAccrueAccount):
 
     def pay(self, sum: int):
         self._notify(f'Оплата с бонусного счета на сумму {sum} рублей')
@@ -58,7 +57,7 @@ class BonusAccount(PayAccount, AccrueAccount):
         self._notify(f'Начисление на бонусный счет на сумму {sum} рублей')
         self.__balance__+=sum
 
-class TotalSpentAccount(AccrueAccount):
+class TotalSpentAccount(Account, IAccrueAccount):
 
     def accrue(self, sum: int):
         self._notify(f'Начисление на счет потрат на сумму {sum} рублей')

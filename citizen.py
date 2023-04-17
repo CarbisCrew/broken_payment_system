@@ -3,11 +3,11 @@ from notify import Notify
 
 class Citizen:
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, cash_account:CashAccount, bonus_account:BonusAccount, total_spent_account:TotalSpentAccount):
         self.name = name
-        self.cash_account = CashAccount()
-        self.bonus_account = BonusAccount()
-        self.total_spent_account = TotalSpentAccount()
+        self.cash_account = cash_account
+        self.bonus_account = bonus_account
+        self.total_spent_account = total_spent_account
 
     @property
     def salary(self):
@@ -26,4 +26,4 @@ class Citizen:
         itogi = f"Наличный счет: {self.cash_balance}\n"
         itogi += f"Бонусный счет: {self.bonus_balance}\n"
         itogi += f"Счет потрат: {self.total_balance}\n"
-        Notify(itogi).sms_send()
+        Notify(itogi).message_send()

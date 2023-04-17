@@ -7,21 +7,20 @@ class PaymentTerminal(ABC):
         self.__citzen__ = citzen
     
     def _notify(self, message: str):
-        notify = Notify(message)
-        notify.sms_send()
+        Notify(message).message_send()
 
-class CashOperation(PaymentTerminal):
+class ICashOperation(ABC):
     @abstractmethod
     def process_cash_operation(self, sum: int):
         pass
 
-class BonusOperation(PaymentTerminal):
+class IBonusOperation(ABC):
     @abstractmethod
     def process_bonus_operation(self, sum: int):
         pass
 
 # Платежный терминал в кафе
-class CafeTerminal(CashOperation, BonusOperation):
+class CafeTerminal(PaymentTerminal,ICashOperation, IBonusOperation):
     def process_cash_operation(self, sum: int):
         try:
             self.__citzen__.cash_account.pay(sum)
@@ -39,7 +38,7 @@ class CafeTerminal(CashOperation, BonusOperation):
             print(e)
 
 # Платежный терминал в кинотеатре
-class CinemaTerminal(CashOperation, BonusOperation):
+class CinemaTerminal(PaymentTerminal,ICashOperation, IBonusOperation):
     def process_cash_operation(self, sum: int):
         try:
             self.__citzen__.cash_account.pay(sum)
@@ -57,7 +56,7 @@ class CinemaTerminal(CashOperation, BonusOperation):
             print(e)
 
 # Платежный терминал в комунальном сервисе
-class UtilityServiceTerminal(CashOperation):
+class UtilityServiceTerminal(PaymentTerminal,ICashOperation):
     def process_cash_operation(self, sum: int):
         try:
             self.__citzen__.cash_account.pay(sum)
@@ -70,7 +69,10 @@ class UtilityServiceTerminal(CashOperation):
             print(e)
 
 # Палтежный терминал на работе
-class JobTerminal(CashOperation):
+class JobTerminal(PaymentTerminal,ICashOperation):
     def process_cash_operation(self, sum: int):
-        self.__citzen__.cash_account.accrue(sum)
-        self._notify(f'Начисление зарплаты')
+        try:
+            self.__citzen__.cash_account.accrue(sum)
+            self._notify(f'Начисление зарплаты')
+        except Exception as e:
+            print(e)
