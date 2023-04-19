@@ -1,7 +1,7 @@
 from citizen import Citizen
 from terminals.terminals import JobTerminal, CafeTerminal, CinemaTerminal, UtilityServiceTerminal
 from accounts.accounts import CashAccount, BonusAccount, TotalSpentAccount
-
+from accounts.exceptions import PaymentError
 if __name__ == "__main__":
 
     job_terminal = JobTerminal()
@@ -17,14 +17,23 @@ if __name__ == "__main__":
     job_terminal.dispatch_operation(john_doe, 800)
 
     # Оплатил комуналку
-    utility_terminal.dispatch_operation(john_doe, 200)
+    try:
+        utility_terminal.dispatch_operation(john_doe, 200)
+    except PaymentError:
+        print('На счете не достаточно средств.')
 
     # Сходил в кино
-    cinema_terminal.dispatch_operation(john_doe, 300)
+    try:
+        cinema_terminal.dispatch_operation(john_doe, 300)
+    except PaymentError:
+        print('На счете не достаточно средств.')
 
     # И поужинал в кафе
-    cafe_terminal.dispatch_operation(john_doe, 45, True)
-    
+    try:
+        cafe_terminal.dispatch_operation(john_doe, 45, use_bonus=True)
+    except PaymentError:
+        print('На счете не достаточно средств.')
+
     # И осталось у джона столько вот денег
     print(john_doe.get_balance())
     

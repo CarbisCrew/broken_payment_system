@@ -16,6 +16,7 @@ class CafeTerminal(PaymentTerminal, IProcessOperation, INotifier):
         self._sum = sum
         billing_account.pay(sum)
 
+
     def add_bonuses(self, billing_account: BonusAccount, sum: int):
         billing_account.accrue(sum * .1)
 
