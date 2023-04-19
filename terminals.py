@@ -96,7 +96,7 @@ class Transaction:
         
         total_writeoffs: Dict[IAccount, int] = defaultdict(lambda: 0)
         
-        for b in self.__bindings__:
+        for b in self.bindings:
             if b.committed: continue
             if isinstance(b, (PayBinding, WriteoffBinding)):
                 total_writeoffs[b.account] += b.sum
@@ -167,7 +167,7 @@ class Notification:
 class Notifier:
 
     def notify(self, greetings: str, transaction: Transaction) -> Notification:
-        text = f'>>{greetings}\n'
+        text = f'>> {greetings}\n'
         text += f'{"-":-^40}\n'
         for item in transaction.__items__:
             text += f'{item.name:<30}'+f'{item.quantity * item.price:>9}\n'
